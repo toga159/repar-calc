@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur PA Max — Rachat téléphones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E7ECEA;
+    --surface: #FFFFFF;
+    --surface-alt: #F3F6F5;
+    --ink: #16232B;
+    --ink-soft: #55666E;
+    --ink-faint: #8A979C;
+    --line: #DCE3E1;
+
+    --accent: #0E8388;
+    --accent-ink: #063638;
+    --accent-soft: #E3F3F2;
+
+    --positive: #1F9D55;
+    --positive-bg: #E9F8EF;
+    --positive-border: #B9E7C9;
+
+    --negative: #D64545;
+    --negative-bg: #FCEBEB;
+    --negative-border: #F1BFBF;
+
+    --radius-lg: 22px;
+    --radius-md: 12px;
+    --shadow-card: 0 24px 48px -28px rgba(22, 35, 43, 0.35);
+
+    --font-display: "Space Grotesk", "Inter", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(14, 131, 136, 0.10), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(14, 131, 136, 0.08), transparent 45%);
+    font-family: var(--font-body);
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 16px 64px;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 440px;
+  }
+
+  .app__header {
+    padding: 4px 6px 24px;
+  }
+
+  .app__header h1 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 8px;
+    color: var(--accent-ink);
+  }
+
+  .app__header p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 38ch;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 24px 22px 20px;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .field .hint {
+    display: block;
+    font-weight: 400;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    margin-top: 4px;
+  }
+
+  select, input[type="number"] {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--surface-alt);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+                       linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+    background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+  }
+
+  select:focus, input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .field-row {
+    position: relative;
+  }
+
+  .field-row .suffix {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-faint);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+
+  .field-row input[type="number"] {
+    padding-right: 32px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 20px 0 18px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 14px;
+  }
+
+  .result {
+    margin-top: 18px;
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--line);
+    background: var(--surface-alt);
+    padding: 22px 22px 20px;
+    text-align: center;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .result__label {
+    margin: 0 0 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .result__value {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 2.4rem;
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+
+  .result__detail {
+    margin: 10px 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    word-break: break-word;
+  }
+
+  .result__message {
+    margin: 10px 0 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .result--positive {
+    background: var(--positive-bg);
+    border-color: var(--positive-border);
+  }
+  .result--positive .result__value { color: var(--positive); }
+  .result--positive .result__message { color: var(--positive); }
+
+  .result--negative {
+    background: var(--negative-bg);
+    border-color: var(--negative-border);
+  }
+  .result--negative .result__value { color: var(--negative); }
+  .result--negative .result__message { color: var(--negative); }
+
+  .footnote {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    margin-top: 18px;
+    padding: 0 12px;
+  }
+
+  @media (max-width: 380px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .result__value { font-size: 2.1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<main class="app">
+
+  <div class="app__header">
+    <h1>Prix d'achat maximum</h1>
+    <p>Fixez le prix maximum à proposer pour racheter un téléphone à réparer, sans rogner sur votre marge.</p>
+  </div>
+
+  <div class="card">
+
+    <div class="field">
+      <label for="model">Modèle du téléphone</label>
+      <select id="model">
+        <option value="">— Choisir un modèle —</option>
+        <optgroup label="iPhone">
+          <option value="iphone8">iPhone 8</option>
+          <option value="iphone8plus">iPhone 8 Plus</option>
+          <option value="iphoneX">iPhone X</option>
+          <option value="iphoneXR">iPhone XR</option>
+          <option value="iphoneXS">iPhone XS</option>
+          <option value="iphoneXSMax">iPhone XS Max</option>
+          <option value="iphoneSE2020">iPhone SE (2020)</option>
+          <option value="iphone11">iPhone 11</option>
+          <option value="iphone11pro">iPhone 11 Pro</option>
+          <option value="iphone11proMax">iPhone 11 Pro Max</option>
+          <option value="iphone12mini">iPhone 12 mini</option>
+          <option value="iphone12">iPhone 12</option>
+          <option value="iphone12pro">iPhone 12 Pro</option>
+          <option value="iphone12proMax">iPhone 12 Pro Max</option>
+          <option value="iphone13mini">iPhone 13 mini</option>
+          <option value="iphone13">iPhone 13</option>
+          <option value="iphone13pro">iPhone 13 Pro</option>
+          <option value="iphone13proMax">iPhone 13 Pro Max</option>
+          <option value="iphone14">iPhone 14</option>
+          <option value="iphone14plus">iPhone 14 Plus</option>
+          <option value="iphone14pro">iPhone 14 Pro</option>
+          <option value="iphone14proMax">iPhone 14 Pro Max</option>
+          <option value="iphone15">iPhone 15</option>
+          <option value="iphone15plus">iPhone 15 Plus</option>
+          <option value="iphone15pro">iPhone 15 Pro</option>
+          <option value="iphone15proMax">iPhone 15 Pro Max</option>
+          <option value="iphone16">iPhone 16</option>
+          <option value="iphone16plus">iPhone 16 Plus</option>
+          <option value="iphone16pro">iPhone 16 Pro</option>
+          <option value="iphone16proMax">iPhone 16 Pro Max</option>
+          <option value="iphone17">iPhone 17</option>
+          <option value="iphone17pro">iPhone 17 Pro</option>
+          <option value="iphone17proMax">iPhone 17 Pro Max</option>
+        </optgroup>
+        <optgroup label="Samsung Galaxy">
+          <option value="galaxyS21">Samsung Galaxy S21</option>
+          <option value="galaxyS22">Samsung Galaxy S22</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="repairType">Réparation prévue</label>
+      <select id="repairType">
+        <option value="ecran">Écran</option>
+        <option value="batterie">Batterie</option>
+        <option value="manuel">Autre / saisie manuelle</option>
+      </select>
+      <span class="hint" id="repairHint">Le coût de la pièce se remplit automatiquement, vous pouvez ensuite l'ajuster.</span>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label for="resalePrice">Prix de revente estimé</label>
+      <div class="field-row">
+        <input type="number" id="resalePrice" inputmode="decimal" min="0" step="1" value="0">
+        <span class="suffix">€</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="partCost">Coût de la pièce</label>
+        <div class="field-row">
+          <input type="number" id="partCost" inputmode="decimal" min="0" step="0.5" value="0">
+          <span class="suffix">€</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="extraCost">Frais annexes</label>
+        <div class="field-row">
+          <input type="number" id="extraCost" inputmode="decimal" min="0" step="0.5" value="10">
+          <span class="suffix">€</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="margin">Marge nette souhaitée</label>
+      <div class="field-row">
+        <input type="number" id="margin" inputmode="decimal" min="0" step="1" value="30">
+        <span class="suffix">€</span>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <p class="result__label">Prix d'achat maximum</p>
+      <p class="result__value" id="resultValue">0,00 €</p>
+      <p class="result__detail" id="resultDetail"></p>
+      <p class="result__message" id="resultMessage"></p>
+    </div>
+
+  </div>
+
+  <p class="footnote">Les coûts de pièces proposés par modèle sont des estimations indicatives — ajustez-les selon vos fournisseurs.</p>
+
+</main>
+
+<script>
+  // Coûts moyens estimés des pièces (€), à titre indicatif
+  const partsData = {
+    iphone8:         { ecran: 25,  batterie: 12 },
+    iphone8plus:     { ecran: 30,  batterie: 13 },
+    iphoneX:         { ecran: 45,  batterie: 15 },
+    iphoneXR:        { ecran: 35,  batterie: 15 },
+    iphoneXS:        { ecran: 50,  batterie: 16 },
+    iphoneXSMax:     { ecran: 55,  batterie: 16 },
+    iphoneSE2020:    { ecran: 30,  batterie: 14 },
+    iphone11:        { ecran: 40,  batterie: 15 },
+    iphone11pro:     { ecran: 55,  batterie: 17 },
+    iphone11proMax:  { ecran: 60,  batterie: 18 },
+    iphone12mini:    { ecran: 45,  batterie: 17 },
+    iphone12:        { ecran: 50,  batterie: 18 },
+    iphone12pro:     { ecran: 60,  batterie: 19 },
+    iphone12proMax:  { ecran: 70,  batterie: 20 },
+    iphone13mini:    { ecran: 55,  batterie: 18 },
+    iphone13:        { ecran: 65,  batterie: 20 },
+    iphone13pro:     { ecran: 80,  batterie: 22 },
+    iphone13proMax:  { ecran: 90,  batterie: 23 },
+    iphone14:        { ecran: 85,  batterie: 22 },
+    iphone14plus:    { ecran: 95,  batterie: 23 },
+    iphone14pro:     { ecran: 130, batterie: 25 },
+    iphone14proMax:  { ecran: 140, batterie: 26 },
+    iphone15:        { ecran: 110, batterie: 25 },
+    iphone15plus:    { ecran: 120, batterie: 26 },
+    iphone15pro:     { ecran: 160, batterie: 28 },
+    iphone15proMax:  { ecran: 175, batterie: 30 },
+    iphone16:        { ecran: 130, batterie: 28 },
+    iphone16plus:    { ecran: 140, batterie: 29 },
+    iphone16pro:     { ecran: 190, batterie: 32 },
+    iphone16proMax:  { ecran: 210, batterie: 34 },
+    iphone17:        { ecran: 150, batterie: 30 },
+    iphone17pro:     { ecran: 220, batterie: 35 },
+    iphone17proMax:  { ecran: 240, batterie: 38 },
+    galaxyS21:       { ecran: 70,  batterie: 20 },
+    galaxyS22:       { ecran: 90,  batterie: 22 },
+  };
+
+  const modelEl = document.getElementById('model');
+  const repairEl = document.getElementById('repairType');
+  const resaleEl = document.getElementById('resalePrice');
+  const partEl = document.getElementById('partCost');
+  const extraEl = document.getElementById('extraCost');
+  const marginEl = document.getElementById('margin');
+
+  const resultEl = document.getElementById('result');
+  const resultValueEl = document.getElementById('resultValue');
+  const resultDetailEl = document.getElementById('resultDetail');
+  const resultMessageEl = document.getElementById('resultMessage');
+  const repairHintEl = document.getElementById('repairHint');
+
+  function formatEuro(value) {
+    return value.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  function autofillPartCost() {
+    const model = modelEl.value;
+    const repair = repairEl.value;
+
+    if (repair === 'manuel' || !model || !partsData[model]) {
+      repairHintEl.textContent = repair === 'manuel'
+        ? 'Saisissez vous-même le coût de la pièce ci-dessous.'
+        : 'Choisissez un modèle pour préremplir le coût de la pièce.';
+      return;
+    }
+
+    const cost = partsData[model][repair];
+    if (typeof cost === 'number') {
+      partEl.value = cost;
+      repairHintEl.textContent = 'Coût préempli pour ce modèle — vous pouvez l’ajuster librement.';
+    }
+  }
+
+  function calculate() {
+    const resale = parseFloat(resaleEl.value) || 0;
+    const part = parseFloat(partEl.value) || 0;
+    const extra = parseFloat(extraEl.value) || 0;
+    const margin = parseFloat(marginEl.value) || 0;
+
+    const paMax = resale - part - extra - margin;
+
+    resultValueEl.textContent = formatEuro(paMax);
+    resultDetailEl.textContent =
+      `${resale.toLocaleString('fr-FR')} − ${part.toLocaleString('fr-FR')} − ${extra.toLocaleString('fr-FR')} − ${margin.toLocaleString('fr-FR')} = ${paMax.toLocaleString('fr-FR', {maximumFractionDigits: 2})}`;
+
+    resultEl.classList.remove('result--positive', 'result--negative');
+
+    if (paMax > 0) {
+      resultEl.classList.add('result--positive');
+      resultMessageEl.textContent = 'Affaire rentable : vous pouvez racheter jusqu’à ce montant.';
+    } else {
+      resultEl.classList.add('result--negative');
+      resultMessageEl.textContent = 'Non rentable : baissez vos coûts ou visez un meilleur prix de revente.';
+    }
+  }
+
+  modelEl.addEventListener('change', () => { autofillPartCost(); calculate(); });
+  repairEl.addEventListener('change', () => { autofillPartCost(); calculate(); });
+  [resaleEl, partEl, extraEl, marginEl].forEach(el => {
+    el.addEventListener('input', calculate);
+  });
+
+  // Initialisation
+  autofillPartCost();
+  calculate();
+</script>
+
+</body>
+</html>
