@@ -101,7 +101,9 @@
     font-weight: 400;
     font-size: 0.78rem;
     color: var(--ink-faint);
-    margin-top: 4px;
+    margin-top: 6px;
+    margin-bottom: 0;
+    line-height: 1.4;
   }
 
   select, input[type="number"] {
@@ -117,6 +119,8 @@
     -webkit-appearance: none;
     appearance: none;
   }
+
+  input[type="number"]::placeholder { color: var(--ink-faint); }
 
   select {
     background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
@@ -161,17 +165,78 @@
   }
 
   .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    display: block;
+    width: fit-content;
     font-size: 0.72rem;
     font-weight: 600;
     color: var(--verified);
     background: var(--verified-bg);
     border-radius: 999px;
     padding: 3px 9px;
-    margin-top: 6px;
+    margin-top: 10px;
   }
+
+  /* ---------- Réparations multiples ---------- */
+  .repairsContainer .repairRow + .repairRow {
+    margin-top: 4px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--line);
+  }
+
+  .repairRow__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .repairRow__title {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--accent-ink);
+    text-transform: uppercase;
+  }
+
+  .repairRow__remove {
+    appearance: none;
+    border: none;
+    background: var(--negative-bg);
+    color: var(--negative);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+  }
+  .repairRow__remove:hover { background: var(--negative-border); }
+
+  .addRepairBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    appearance: none;
+    border: 1.5px dashed var(--line);
+    background: var(--surface-alt);
+    color: var(--accent-ink);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .addRepairBtn:hover { border-color: var(--accent); background: var(--accent-soft); }
 
   .result {
     margin-top: 18px;
@@ -298,48 +363,21 @@
       </select>
     </div>
 
-    <div class="field">
-      <label for="repairType">Réparation prévue</label>
-      <select id="repairType">
-        <option value="ecran">Écran</option>
-        <option value="batterie">Batterie</option>
-        <option value="chassis">Châssis / coque arrière</option>
-        <option value="camArriere">Caméra arrière</option>
-        <option value="camAvant">Caméra avant (selfie)</option>
-        <option value="connecteurCharge">Connecteur de charge</option>
-        <option value="hautParleur">Haut-parleur</option>
-        <option value="ecouteur">Écouteur interne</option>
-        <option value="lecteurSim">Lecteur carte SIM</option>
-        <option value="boutonPower">Bouton power / volume</option>
-        <option value="manuel">Autre / saisie manuelle</option>
-      </select>
-    </div>
+    <div class="repairsContainer" id="repairsContainer"></div>
 
-    <div class="field" id="qualiteField">
-      <label for="qualite">Qualité de la pièce</label>
-      <select id="qualite"></select>
-      <span class="hint" id="repairHint">Le coût de la pièce se remplit automatiquement, vous pouvez ensuite l'ajuster.</span>
-      <span class="badge" id="verifiedBadge" style="display:none;">✓ Prix vérifié sur le site fournisseur</span>
-    </div>
+    <button type="button" class="addRepairBtn" id="addRepairBtn">+ Ajouter une autre réparation</button>
 
     <hr class="divider">
 
     <div class="field">
       <label for="resalePrice">Prix de revente estimé</label>
       <div class="field-row">
-        <input type="number" id="resalePrice" inputmode="decimal" min="0" step="1" value="0">
+        <input type="number" id="resalePrice" inputmode="decimal" min="0" step="1" placeholder="ex: 350">
         <span class="suffix">€</span>
       </div>
     </div>
 
     <div class="grid-2">
-      <div class="field">
-        <label for="partCost">Coût de la pièce</label>
-        <div class="field-row">
-          <input type="number" id="partCost" inputmode="decimal" min="0" step="0.5" value="0">
-          <span class="suffix">€</span>
-        </div>
-      </div>
       <div class="field">
         <label for="extraCost">Frais annexes</label>
         <div class="field-row">
@@ -347,21 +385,20 @@
           <span class="suffix">€</span>
         </div>
       </div>
-    </div>
-
-    <div class="field">
-      <label for="margin">Marge nette souhaitée</label>
-      <div class="field-row">
-        <input type="number" id="margin" inputmode="decimal" min="0" step="1" value="30">
-        <span class="suffix">€</span>
+      <div class="field">
+        <label for="margin">Marge nette souhaitée</label>
+        <div class="field-row">
+          <input type="number" id="margin" inputmode="decimal" min="0" step="1" value="30">
+          <span class="suffix">€</span>
+        </div>
       </div>
     </div>
 
     <div class="result" id="result">
       <p class="result__label">Prix d'achat maximum</p>
-      <p class="result__value" id="resultValue">0,00 €</p>
+      <p class="result__value" id="resultValue">—</p>
       <p class="result__detail" id="resultDetail"></p>
-      <p class="result__message" id="resultMessage"></p>
+      <p class="result__message" id="resultMessage">Renseignez un prix de revente pour lancer le calcul.</p>
     </div>
 
   </div>
@@ -375,7 +412,7 @@
      Ces deux valeurs par modèle servent d'ancrage : le prix écran correspond
      au niveau "Optimum" (qualité milieu de gamme), le prix batterie au niveau
      "Standard / Générique". Les autres pièces sont dérivées de ces deux ancrages.
-     Les valeurs marquées verified:true ont été relevées directement sur le site. */
+     Les valeurs listées dans verified ont été relevées directement sur le site. */
   const baseData = {
     iphone8:         { ecran: 25,  batterie: 12 },
     iphone8plus:     { ecran: 30,  batterie: 13 },
@@ -419,18 +456,18 @@
     ecran: {
       base: "ecran",
       options: [
-        { key: "standard",      label: "Standard (Incell)",             mult: 0.55 },
-        { key: "optimum",       label: "Optimum (Soft/Hard OLED)",       mult: 1.00 },
-        { key: "origine",       label: "Origine désassemblé",            mult: 1.35 },
-        { key: "reconditionne", label: "Reconditionné (testé)",          mult: 1.60 },
+        { key: "standard",      label: "Standard (Incell)",         mult: 0.55 },
+        { key: "optimum",       label: "Optimum (Soft/Hard OLED)",   mult: 1.00 },
+        { key: "origine",       label: "Origine désassemblé",        mult: 1.35 },
+        { key: "reconditionne", label: "Reconditionné (testé)",      mult: 1.60 },
       ]
     },
     batterie: {
       base: "batterie",
       options: [
-        { key: "sansBms",  label: "Sans BMS",              mult: 0.85 },
-        { key: "standard", label: "Standard / Générique",  mult: 1.00 },
-        { key: "origine",  label: "Ti-Origine",             mult: 1.90 },
+        { key: "sansBms",  label: "Sans BMS",             mult: 0.85 },
+        { key: "standard", label: "Standard / Générique", mult: 1.00 },
+        { key: "origine",  label: "Ti-Origine",            mult: 1.90 },
       ]
     },
     chassis:          { base: "ecran",    derive: 0.45, options: [ { key: "compatible", label: "Compatible", mult: 1.00 }, { key: "origine", label: "Origine démonté", mult: 1.40 } ] },
@@ -443,12 +480,24 @@
     boutonPower:      { base: "batterie", derive: 0.90, options: [ { key: "compatible", label: "Compatible", mult: 1.00 }, { key: "origine", label: "Origine démonté", mult: 1.30 } ] },
   };
 
+  const repairTypeOptionsHTML = `
+    <option value="ecran">Écran</option>
+    <option value="batterie">Batterie</option>
+    <option value="chassis">Châssis / coque arrière</option>
+    <option value="camArriere">Caméra arrière</option>
+    <option value="camAvant">Caméra avant (selfie)</option>
+    <option value="connecteurCharge">Connecteur de charge</option>
+    <option value="hautParleur">Haut-parleur</option>
+    <option value="ecouteur">Écouteur interne</option>
+    <option value="lecteurSim">Lecteur carte SIM</option>
+    <option value="boutonPower">Bouton power / volume</option>
+    <option value="manuel">Autre / saisie manuelle</option>
+  `;
+
   const modelEl = document.getElementById('model');
-  const repairEl = document.getElementById('repairType');
-  const qualiteEl = document.getElementById('qualite');
-  const qualiteFieldEl = document.getElementById('qualiteField');
+  const repairsContainer = document.getElementById('repairsContainer');
+  const addRepairBtn = document.getElementById('addRepairBtn');
   const resaleEl = document.getElementById('resalePrice');
-  const partEl = document.getElementById('partCost');
   const extraEl = document.getElementById('extraCost');
   const marginEl = document.getElementById('margin');
 
@@ -456,8 +505,8 @@
   const resultValueEl = document.getElementById('resultValue');
   const resultDetailEl = document.getElementById('resultDetail');
   const resultMessageEl = document.getElementById('resultMessage');
-  const repairHintEl = document.getElementById('repairHint');
-  const verifiedBadgeEl = document.getElementById('verifiedBadge');
+
+  let rowCounter = 0;
 
   function formatEuro(value) {
     return value.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -472,15 +521,18 @@
     return cfg.derive ? raw * cfg.derive : raw;
   }
 
-  function populateQualityOptions() {
-    const repair = repairEl.value;
-    qualiteEl.innerHTML = '';
+  function populateQualityOptions(row) {
+    const repairSel = row.querySelector('.repairType');
+    const qualiteSel = row.querySelector('.qualite');
+    const qualiteField = row.querySelector('.qualiteField');
+    const repair = repairSel.value;
+    qualiteSel.innerHTML = '';
 
     if (repair === 'manuel') {
-      qualiteFieldEl.style.display = 'none';
+      qualiteField.style.display = 'none';
       return;
     }
-    qualiteFieldEl.style.display = '';
+    qualiteField.style.display = '';
 
     const cfg = qualityConfig[repair];
     cfg.options.forEach(opt => {
@@ -489,19 +541,25 @@
       o.textContent = opt.label;
       if (repair === 'ecran' && opt.key === 'optimum') o.selected = true;
       if (repair === 'batterie' && opt.key === 'standard') o.selected = true;
-      qualiteEl.appendChild(o);
+      qualiteSel.appendChild(o);
     });
   }
 
-  function autofillPartCost() {
-    const model = modelEl.value;
-    const repair = repairEl.value;
-    const quality = qualiteEl.value;
+  function autofillPartCost(row) {
+    const repairSel = row.querySelector('.repairType');
+    const qualiteSel = row.querySelector('.qualite');
+    const hintEl = row.querySelector('.repairHint');
+    const badgeEl = row.querySelector('.verifiedBadge');
+    const partEl = row.querySelector('.partCost');
 
-    verifiedBadgeEl.style.display = 'none';
+    const model = modelEl.value;
+    const repair = repairSel.value;
+    const quality = qualiteSel.value;
+
+    badgeEl.style.display = 'none';
 
     if (repair === 'manuel' || !model) {
-      repairHintEl.textContent = repair === 'manuel'
+      hintEl.textContent = repair === 'manuel'
         ? 'Saisissez vous-même le coût de la pièce ci-dessous.'
         : 'Choisissez un modèle pour préremplir le coût de la pièce.';
       return;
@@ -509,7 +567,7 @@
 
     const base = getBaseCost(model, repair);
     if (base === null) {
-      repairHintEl.textContent = 'Coût non disponible pour cette combinaison — saisie manuelle.';
+      hintEl.textContent = 'Coût non disponible pour cette combinaison — saisie manuelle.';
       return;
     }
 
@@ -519,28 +577,108 @@
 
     const cost = Math.round(base * opt.mult * 100) / 100;
     partEl.value = cost;
-    repairHintEl.textContent = 'Coût préempli pour ce modèle et cette qualité — vous pouvez l\u2019ajuster librement.';
+    hintEl.textContent = 'Coût préempli pour ce modèle et cette qualité — vous pouvez l\u2019ajuster librement.';
 
     const modelData = baseData[model];
     const verifiedList = modelData.verified && modelData.verified[repair];
     if (verifiedList && verifiedList.includes(quality)) {
-      verifiedBadgeEl.style.display = 'inline-flex';
+      badgeEl.style.display = 'block';
     }
   }
 
+  function renumberRows() {
+    const rows = repairsContainer.querySelectorAll('.repairRow');
+    rows.forEach((row, index) => {
+      row.querySelector('.repairRow__title').textContent = `Réparation ${index + 1}`;
+    });
+    // On ne peut supprimer une réparation que s'il en reste au moins une autre après.
+    rows.forEach(row => {
+      row.querySelector('.repairRow__remove').style.display = rows.length > 1 ? 'flex' : 'none';
+    });
+  }
+
+  function createRepairRow(defaultRepair) {
+    rowCounter++;
+    const row = document.createElement('div');
+    row.className = 'repairRow';
+    row.dataset.rowId = rowCounter;
+    row.innerHTML = `
+      <div class="repairRow__head">
+        <span class="repairRow__title">Réparation</span>
+        <button type="button" class="repairRow__remove" aria-label="Supprimer cette réparation" style="display:none;">✕</button>
+      </div>
+      <div class="field">
+        <label>Réparation prévue</label>
+        <select class="repairType">${repairTypeOptionsHTML}</select>
+      </div>
+      <div class="field qualiteField">
+        <label>Qualité de la pièce</label>
+        <select class="qualite"></select>
+        <span class="hint repairHint">Le coût de la pièce se remplit automatiquement, vous pouvez ensuite l'ajuster.</span>
+        <span class="badge verifiedBadge" style="display:none;">✓ Prix vérifié sur le site fournisseur</span>
+      </div>
+      <div class="field">
+        <label>Coût de la pièce</label>
+        <div class="field-row">
+          <input type="number" class="partCost" inputmode="decimal" min="0" step="0.5" value="0">
+          <span class="suffix">€</span>
+        </div>
+      </div>
+    `;
+    repairsContainer.appendChild(row);
+
+    if (defaultRepair) {
+      row.querySelector('.repairType').value = defaultRepair;
+    }
+
+    const repairSel = row.querySelector('.repairType');
+    const qualiteSel = row.querySelector('.qualite');
+    const partEl = row.querySelector('.partCost');
+    const removeBtn = row.querySelector('.repairRow__remove');
+
+    repairSel.addEventListener('change', () => { populateQualityOptions(row); autofillPartCost(row); calculate(); });
+    qualiteSel.addEventListener('change', () => { autofillPartCost(row); calculate(); });
+    partEl.addEventListener('input', calculate);
+    removeBtn.addEventListener('click', () => {
+      row.remove();
+      renumberRows();
+      calculate();
+    });
+
+    populateQualityOptions(row);
+    autofillPartCost(row);
+    renumberRows();
+
+    return row;
+  }
+
   function calculate() {
-    const resale = parseFloat(resaleEl.value) || 0;
-    const part = parseFloat(partEl.value) || 0;
+    const resaleRaw = resaleEl.value.trim();
+    const hasResale = resaleRaw !== '';
+    const resale = parseFloat(resaleRaw) || 0;
+
+    let totalParts = 0;
+    repairsContainer.querySelectorAll('.partCost').forEach(input => {
+      totalParts += parseFloat(input.value) || 0;
+    });
+
     const extra = parseFloat(extraEl.value) || 0;
     const margin = parseFloat(marginEl.value) || 0;
 
-    const paMax = resale - part - extra - margin;
+    resultEl.classList.remove('result--positive', 'result--negative');
+
+    if (!hasResale) {
+      resultValueEl.textContent = '—';
+      resultDetailEl.textContent = '';
+      resultMessageEl.textContent = 'Renseignez un prix de revente pour lancer le calcul.';
+      return;
+    }
+
+    const paMax = resale - totalParts - extra - margin;
 
     resultValueEl.textContent = formatEuro(paMax);
     resultDetailEl.textContent =
-      `${resale.toLocaleString('fr-FR')} − ${part.toLocaleString('fr-FR')} − ${extra.toLocaleString('fr-FR')} − ${margin.toLocaleString('fr-FR')} = ${paMax.toLocaleString('fr-FR', {maximumFractionDigits: 2})}`;
-
-    resultEl.classList.remove('result--positive', 'result--negative');
+      `${resale.toLocaleString('fr-FR')} − ${totalParts.toLocaleString('fr-FR', {maximumFractionDigits: 2})} − ${extra.toLocaleString('fr-FR')} − ${margin.toLocaleString('fr-FR')} = ${paMax.toLocaleString('fr-FR', {maximumFractionDigits: 2})}`;
 
     if (paMax > 0) {
       resultEl.classList.add('result--positive');
@@ -551,16 +689,18 @@
     }
   }
 
-  modelEl.addEventListener('change', () => { autofillPartCost(); calculate(); });
-  repairEl.addEventListener('change', () => { populateQualityOptions(); autofillPartCost(); calculate(); });
-  qualiteEl.addEventListener('change', () => { autofillPartCost(); calculate(); });
-  [resaleEl, partEl, extraEl, marginEl].forEach(el => {
-    el.addEventListener('input', calculate);
+  modelEl.addEventListener('change', () => {
+    repairsContainer.querySelectorAll('.repairRow').forEach(row => autofillPartCost(row));
+    calculate();
   });
+  addRepairBtn.addEventListener('click', () => {
+    createRepairRow('batterie');
+    calculate();
+  });
+  [resaleEl, extraEl, marginEl].forEach(el => el.addEventListener('input', calculate));
 
-  // Initialisation
-  populateQualityOptions();
-  autofillPartCost();
+  // Initialisation : une première réparation "Écran" par défaut
+  createRepairRow('ecran');
   calculate();
 </script>
 
